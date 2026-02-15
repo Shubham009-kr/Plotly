@@ -32,6 +32,10 @@ const Upload: React.FC<UploadProps> = ({ onComplete: onCompleteProp }) => {
     if (!isSignedIn) return;
 
     const reader = new FileReader();
+    reader.onerror = () =>{
+        setFile(null);
+        setProgress(0);
+    };
 
     reader.onload = () => {
       const base64Data = reader.result as string;
@@ -91,7 +95,13 @@ const Upload: React.FC<UploadProps> = ({ onComplete: onCompleteProp }) => {
     if (!isSignedIn) return;
 
     const droppedFile = e.dataTransfer.files?.[0];
-    if (!droppedFile) return;
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (!droppedFile) {
+      return;
+    }
+    if (!allowedTypes.includes(droppedFile.type)) {
+      return;
+    }
 
     setFile(droppedFile);
     setProgress(0);
