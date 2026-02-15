@@ -1,6 +1,6 @@
 import Navbar from "components/Navbar";
 import type { Route } from "./+types/home";
-import { ArrowRight, Layers } from "lucide-react";
+import { ArrowRight, ArrowUp, ArrowUpRight, Clock, Layers } from "lucide-react";
 import Button from "components/ui/Button";
 
 export function meta({}: Route.MetaArgs) {
@@ -41,6 +41,39 @@ export default function Home() {
               <p>Supports JPG, PNG, formats up to 10MB</p>
             </div>
             <p>Upload Images</p>
+          </div>
+        </div>
+      </section>
+      <section className="projects">
+        <div className="section-inner">
+          <div className="section-head">
+            <div className="copy">
+              <h2>Projects</h2>
+              <p>Your latest work and shared community projects, all in one place.</p>
+            </div>
+          </div>
+          <div className="projects-grid">
+            <div className="project-card group">
+              <div className="preview">
+                <img src="https://roomify-mlhuk267-dfwu1i.puter.site/projects/1770803585402/rendered.png" alt="Project" />
+                <div className="badge">
+                  <span>Community</span>
+                </div>
+              </div>
+              <div className="card-body">
+                <div>
+                  <h3>Project Prix</h3>
+                  <div className="meta">
+                    <Clock size={12} />
+                    <span>{new Date('01.23.2026').toLocaleDateString()}</span>
+                    <span>By SLYTHRN</span>
+                  </div>
+                </div>
+                <div className="arrow">
+                  <ArrowUpRight size={18} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
