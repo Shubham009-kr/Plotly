@@ -19,9 +19,12 @@ export const fetchAsDataUrl = async (url: string): Promise<string> => {
 };
 
 export const generate3DView = async ({ sourceImage }: Generate3DViewParams) => {
+    console.log("Entered generate3DView fcn");
     const dataUrl = sourceImage.startsWith('data:')
         ? sourceImage
         : await fetchAsDataUrl(sourceImage);
+
+    console.log(dataUrl);
 
     const base64Data = dataUrl.split(',')[1];
     const mimeType = dataUrl.split(';')[0].split(':')[1];
@@ -37,6 +40,7 @@ export const generate3DView = async ({ sourceImage }: Generate3DViewParams) => {
     });
 
     const rawImageUrl = (response as HTMLImageElement).src ?? null;
+    console.log("Hello");
 
     if (!rawImageUrl) return { renderedImage: null, renderedPath: undefined };
 
