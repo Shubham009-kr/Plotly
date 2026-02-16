@@ -1,26 +1,56 @@
 import Button from 'components/ui/Button';
 import { generate3DView } from 'lib/ai.action';
+import { createProject, getProjectById } from 'lib/puter.action';
 import { Box, Download, RefreshCcw, Share2, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router'
+import { useNavigate, useOutletContext, useParams } from 'react-router'
 
 const visualizerId = () => {
 
+    const { id } = useParams();
     const navigate = useNavigate();
-    const location = useLocation();
-    const { initialImage, initialRender, name } = location.state || {};
+    const { userId } = useOutletContext<AuthContext>();
     const hasInitialGenerated = useRef(false);
+    const [project, setProject] = useState<DesignItem | null>(null);
+    const [isProjectLoading, setIsProjectLoading] = useState(true);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [currentImage, setCurrentImage] = useState<string | null>(initialRender || null);
+    const [currentImage, setCurrentImage] = useState<string | null>(null);
     const handleBack = () => navigate('/');
-    const runGeneration = async () =>{
-        if(!initialImage) return;
+
+    const handleExport = () => {
+        if (!currentImage) return;
+
+        const link = document.createElement('a');
+        link.href = currentImage;
+        link.download = `roomify-${id || 'design'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const runGeneration = async (item: DesignItem) =>{
+        if(!id || !item.sourceImage) return;
         try{
             setIsProcessing(true);
-            const result = await generate3DView({sourceImage: initialImage});
+            const result = await generate3DView({sourceImage: item.sourceImage});
 
             if(result.renderedImage){
                 setCurrentImage(result.renderedImage);
+                const updatedItem = {
+                    ...item,
+                    renderedImage: result.renderedImage,
+                    renderedPath: result.renderedPath,
+                    timestamp: Date.now(),
+                    ownerId: item.ownerId ?? userId ?? null,
+                    isPublic: item.isPublic ?? false,
+                }
+
+                const saved = await createProject({item: updatedItem, visibility: "private"});
+
+                if(saved){
+                    setProject(saved);
+                    setCurrentImage(saved.renderedImage || result.renderedImage);
+                }
 
             } 
         }catch (error){
@@ -30,18 +60,35 @@ const visualizerId = () => {
         }
 
         useEffect(() => {
-          if(!initialImage || hasInitialGenerated.current) return;
+        let isMounted = true;
 
-          if(initialRender){
-            setCurrentImage(initialRender);
+        const loadProject = async () => {
+        };
+
+        loadProject();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
+
+    useEffect(() => {
+        if (
+            isProjectLoading ||
+            hasInitialGenerated.current ||
+            !project?.sourceImage
+        )
+            return;
+
+        if (project.renderedImage) {
+            setCurrentImage(project.renderedImage);
             hasInitialGenerated.current = true;
             return;
-          }
+        }
 
-          hasInitialGenerated.current = true;
-          runGeneration();
-        
-        }, [initialImage, initialRender])
+        hasInitialGenerated.current = true;
+        void runGeneration(project);
+    }, [project, isProjectLoading]);
         
     }
   return (
@@ -95,12 +142,6 @@ const visualizerId = () => {
                 </div>
             </div>
         </section>
-        {initialImage && (
-            <div className='image-container'>
-                <h2>Source Image</h2>
-                <img src={initialImage} alt="Source" />
-            </div>
-        )}
     </div>
   )
 }
