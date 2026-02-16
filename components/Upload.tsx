@@ -117,7 +117,7 @@ const Upload: React.FC<UploadProps> = ({ onComplete: onCompleteProp }) => {
           <input
             type="file"
             className="drop-input"
-            accept=".jpg, .jpeg, .png"
+            accept=".jpg, .jpeg, .png, .webp"
             disabled={!isSignedIn}
             onChange={handleFileChange}
           />
