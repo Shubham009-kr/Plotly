@@ -40,7 +40,7 @@ const Navbar = () => {
                 {isSignedIn?(
                     <>
                         <span className='greeting'>{userName?`Hi, ${userName}`:'Signed In'}</span>
-                        <Button size='sm' onClick={handleAuthClick} className='btn'>Log Out</Button>
+                        <Button size='sm' onClick={handleAuthClick} className='cta'>Log Out</Button>
                     </>
                 ):(<>
                 
